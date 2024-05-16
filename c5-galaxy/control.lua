@@ -95,10 +95,25 @@ script.on_event(
   function(e)
     for index, player in pairs(game.connected_players) do
       if player and player.driving and player.vehicle and player.surface then
-        if player.vehicle.name == "c5-galaxy-grounded" and player.vehicle.speed * 60 * 3.6 > settings.global["takeoff-speed-kmh"].value then
-          local old_riding_state = player.riding_state
-          swap_plane_prototype("c5-galaxy-grounded", "c5-galaxy-flying", player)
-          player.riding_state = old_riding_state
+        if player.vehicle.name == "c5-galaxy-grounded" then
+          if player.vehicle.speed * 60 * 3.6 > settings.global["takeoff-speed-kmh"].value then
+            local old_riding_state = player.riding_state
+            swap_plane_prototype("c5-galaxy-grounded", "c5-galaxy-flying", player)
+            player.riding_state = old_riding_state
+          end
+
+          if player.vehicle.speed == 0 then
+            local tile = player.surface.get_tile(player.vehicle.position)
+            local cliff = player.surface.find_entity("cliff", player.vehicle.position)
+            if cliff or tile.collides_with("water-tile") then
+              local vehicle = player.vehicle
+              local driver = vehicle.get_driver()
+              local passenger = vehicle.get_passenger()
+              if driver then driver.die() end
+              if passenger then passenger.die() end
+              vehicle.die()
+            end
+          end
         elseif player.vehicle.name == "c5-galaxy-flying" then
           if player.vehicle.speed * 60 * 3.6 < settings.global["takeoff-speed-kmh"].value then
             local old_riding_state = player.riding_state
@@ -113,19 +128,6 @@ script.on_event(
         end
 
         update_shadow(player)
-
-        if player.vehicle.speed == 0 then
-          local tile = player.surface.get_tile(player.vehicle.position)
-          local cliff = player.surface.find_entity("cliff", player.vehicle.position)
-          if cliff or tile.collides_with("water-tile") then
-            local vehicle = player.vehicle
-            local driver = vehicle.get_driver()
-            local passenger = vehicle.get_passenger()
-            if driver then driver.die() end
-            if passenger then passenger.die() end
-            vehicle.die()
-          end
-        end
       end
     end
   end
