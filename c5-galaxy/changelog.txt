@@ -3,3 +3,8 @@ Version: 1.0.1
 Date: 2024-05-16
   Bugfixes:
     - The mod no longer kills all vehicles standing still in water. Sorry!
+---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2024-05-16
+  Bugfixes:
+    - The plane no longer loses its trunk inventory on takeoff and landing. Sorry again!

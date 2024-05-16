@@ -44,9 +44,8 @@ local function swap_plane_prototype(name_from, name_to, player)
     new.burner.currently_burning = old.burner.currently_burning
     new.burner.remaining_burning_fuel = old.burner.remaining_burning_fuel
   end
-  copy_inventory(old.get_fuel_inventory(), new.get_fuel_inventory())
-
-  copy_inventory(old.get_main_inventory(), new.get_main_inventory())
+  copy_inventory(old.get_inventory(defines.inventory.fuel), new.get_inventory(defines.inventory.fuel))
+  copy_inventory(old.get_inventory(defines.inventory.car_trunk), new.get_inventory(defines.inventory.car_trunk))
 
   new.destructible = old.destructible
   new.operable = old.operable
