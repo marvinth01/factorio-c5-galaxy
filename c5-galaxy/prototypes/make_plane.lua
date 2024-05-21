@@ -18,6 +18,7 @@ local function make_plane(grounded)
     plane.effectivity = 16.0
     plane.braking_power = "32MW"
   end
+  plane.is_military_target = grounded
   plane.max_health = 5000
   plane.minable = { mining_time = 3.0, result = "c5-galaxy" }
   plane.rotation_speed = 0.003

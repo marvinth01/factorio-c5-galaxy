@@ -8,3 +8,8 @@ Version: 1.0.2
 Date: 2024-05-16
   Bugfixes:
     - The plane no longer loses its trunk inventory on takeoff and landing. Sorry again!
+---------------------------------------------------------------------------------------------------
+Version: 1.0.3
+Date: 2024-05-21
+  Changes:
+    - Once the plane is in the air, it is no longer a priority military target.
