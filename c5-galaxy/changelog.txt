@@ -13,3 +13,9 @@ Version: 1.0.3
 Date: 2024-05-21
   Changes:
     - Once the plane is in the air, it is no longer a priority military target.
+---------------------------------------------------------------------------------------------------
+Version: 1.0.4
+Date: 2024-06-11
+  Changes:
+    - Plane fuel usage when airborne increased to the value of the grounded plane
+    - Slightly reduced acceleration when airborne

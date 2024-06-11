@@ -14,8 +14,8 @@ local function make_plane(grounded)
     plane.name = "c5-galaxy-flying"
     plane.collision_mask = {}
     plane.friction = 0.00005
-    plane.consumption = "2MW"
-    plane.effectivity = 16.0
+    plane.consumption = "8MW"
+    plane.effectivity = 1.5
     plane.braking_power = "32MW"
   end
   plane.is_military_target = grounded
