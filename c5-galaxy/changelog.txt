@@ -19,3 +19,10 @@ Date: 2024-06-11
   Changes:
     - Plane fuel usage when airborne increased to the value of the grounded plane
     - Slightly reduced acceleration when airborne
+---------------------------------------------------------------------------------------------------
+Version: 1.0.5
+Date: 2024-06-11
+  Changes:
+    - Changed map icon to a plane
+  Bugfixes:
+    - While airborne, the plane no longer interacts with inserters

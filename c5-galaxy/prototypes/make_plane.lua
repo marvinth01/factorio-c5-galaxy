@@ -3,6 +3,11 @@
 local function make_plane(grounded)
   local plane = table.deepcopy(data.raw["car"]["car"])
 
+  if not grounded then
+    table.insert(plane.flags, "no-automated-item-insertion")
+    table.insert(plane.flags, "no-automated-item-removal")
+  end
+
   if grounded then
     plane.name = "c5-galaxy-grounded"
     plane.collision_mask = { "player-layer", "train-layer" }
@@ -134,6 +139,21 @@ local function make_plane(grounded)
   plane.turret_rotation_speed = nil
   plane.turret_return_timeout = nil
   plane.guns = nil
+
+  plane.minimap_representation = {
+    -- Credits to the aircraft mod
+    filename = "__c5-galaxy__/graphics/aircraft-minimap-representation.png",
+    flags = { "icon" },
+    size = { 40, 40 },
+    scale = 1.0
+  }
+  plane.selected_minimap_representation = {
+    -- Credits to the aircraft mod
+    filename = "__c5-galaxy__/graphics/aircraft-minimap-representation-selected.png",
+    flags = { "icon" },
+    size = { 40, 40 },
+    scale = 1.0
+  }
 
   return plane
 end
