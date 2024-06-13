@@ -26,3 +26,8 @@ Date: 2024-06-11
     - Changed map icon to a plane
   Bugfixes:
     - While airborne, the plane no longer interacts with inserters
+---------------------------------------------------------------------------------------------------
+Version: 1.0.6
+Date: 2024-06-13
+  Changes:
+    - Backwards speed is now capped

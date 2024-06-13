@@ -1,3 +1,10 @@
+---@param str string
+---@param start string
+---@return boolean
+local function starts_with(str, start)
+  return str:sub(1, #start) == start
+end
+
 ---@param orientation double
 ---@param n_idx uint
 ---@return number
@@ -94,6 +101,17 @@ script.on_event(
   function(e)
     for index, player in pairs(game.connected_players) do
       if player and player.driving and player.vehicle and player.surface then
+        if starts_with(player.vehicle.name, "c5-galaxy-") then
+          -- Speed check
+          local max_speed = 500 / (60 * 3.6)
+          local min_speed = -10 / (60 * 3.6)
+          if player.vehicle.speed > max_speed then
+            player.vehicle.speed = max_speed
+          elseif player.vehicle.speed < min_speed then
+            player.vehicle.speed = min_speed
+          end
+        end
+
         if player.vehicle.name == "c5-galaxy-grounded" then
           if player.vehicle.speed * 60 * 3.6 > settings.global["takeoff-speed-kmh"].value then
             local old_riding_state = player.riding_state
@@ -118,11 +136,6 @@ script.on_event(
             local old_riding_state = player.riding_state
             swap_plane_prototype("c5-galaxy-flying", "c5-galaxy-grounded", player)
             player.riding_state = old_riding_state
-          end
-
-          local max_speed = 500 / (60 * 3.6)
-          if player.vehicle.speed > max_speed then
-            player.vehicle.speed = max_speed
           end
         end
 
