@@ -104,7 +104,7 @@ script.on_event(
         if starts_with(player.vehicle.name, "c5-galaxy-") then
           -- Speed check
           local max_speed = 500 / (60 * 3.6)
-          local min_speed = -10 / (60 * 3.6)
+          local min_speed = -25 / (60 * 3.6)
           if player.vehicle.speed > max_speed then
             player.vehicle.speed = max_speed
           elseif player.vehicle.speed < min_speed then

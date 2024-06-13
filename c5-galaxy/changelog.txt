@@ -31,3 +31,8 @@ Version: 1.0.6
 Date: 2024-06-13
   Changes:
     - Backwards speed is now capped
+---------------------------------------------------------------------------------------------------
+Version: 1.0.7
+Date: 2024-06-13
+  Changes:
+    - Increased backwards speed
