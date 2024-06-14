@@ -1,3 +1,8 @@
+data:extend { {
+  type = "trigger-target-type",
+  name = "high-altitude-unit",
+} }
+
 local make_plane = require("prototypes.make_plane")
 local plane_grounded = make_plane(true)
 local plane_flying = make_plane(false)

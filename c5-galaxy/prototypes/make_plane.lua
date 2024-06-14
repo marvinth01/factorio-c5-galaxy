@@ -11,26 +11,26 @@ local function make_plane(grounded)
   if grounded then
     plane.name = "c5-galaxy-grounded"
     plane.collision_mask = { "player-layer", "train-layer" }
-    plane.friction = 0.0005
-    plane.consumption = "8MW"
-    plane.effectivity = 1.0
+    plane.terrain_friction_modifier = 1.0
     plane.braking_power = "5MW"
   else
     plane.name = "c5-galaxy-flying"
     plane.collision_mask = {}
-    plane.friction = 0.00005
-    plane.consumption = "8MW"
-    plane.effectivity = 1.5
+    plane.terrain_friction_modifier = 0.0
     plane.braking_power = "32MW"
+    plane.selection_priority = 51
+    plane.trigger_target_mask = { "high-altitude-unit" }
   end
+  plane.consumption = "12MW"
+  plane.effectivity = 0.8
+  plane.friction = 0.00025
   plane.is_military_target = grounded
   plane.max_health = 5000
   plane.minable = { mining_time = 3.0, result = "c5-galaxy" }
   plane.rotation_speed = 0.003
-  plane.weight = 50000
-  plane.energy_per_hit_point = 2.0
+  plane.weight = 60000
+  plane.energy_per_hit_point = 4.0
   plane.inventory_size = 960
-  plane.terrain_friction_modifier = 0.5
   plane.burner = {
     fuel_category = "chemical",
     effectivity = 1,
@@ -45,7 +45,6 @@ local function make_plane(grounded)
   plane.selection_box = { { -3.0, -8.5 }, { 3.0, 8.5 } }
 
   if grounded then
-    -- Copied from tank
     plane.resistances = {
       {
         type = "fire",
@@ -55,17 +54,17 @@ local function make_plane(grounded)
       {
         type = "physical",
         decrease = 15,
-        percent = 60,
+        percent = 50,
       },
       {
         type = "impact",
-        decrease = 50,
-        percent = 80,
+        decrease = 20,
+        percent = 30,
       },
       {
         type = "explosion",
         decrease = 15,
-        percent = 70,
+        percent = 40,
       },
       {
         type = "acid",

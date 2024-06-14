@@ -32,16 +32,16 @@ end
 
 ---@param name_from string
 ---@param name_to string
----@param player LuaPlayer
-local function swap_plane_prototype(name_from, name_to, player)
-  assert(player.vehicle.name == name_from)
-  local old = player.vehicle
+---@param plane LuaEntity
+local function swap_plane_prototype(name_from, name_to, plane)
+  assert(plane.name == name_from)
+  local old = plane
   assert(old)
-  local new = player.surface.create_entity {
+  local new = plane.surface.create_entity {
     name = name_to,
-    position = player.vehicle.position,
-    direction = player.vehicle.direction,
-    force = player.vehicle.force,
+    position = plane.position,
+    direction = plane.direction,
+    force = plane.force,
     create_build_effect_smoke = false,
   }
   assert(new)
@@ -61,6 +61,7 @@ local function swap_plane_prototype(name_from, name_to, player)
   new.friction_modifier = old.friction_modifier
   new.speed = old.speed
   new.orientation = old.orientation
+  new.riding_state = old.riding_state
 
   local driver = old.get_driver()
   local passenger = old.get_passenger()
@@ -69,77 +70,83 @@ local function swap_plane_prototype(name_from, name_to, player)
   new.set_passenger(passenger)
 end
 
----@param player LuaPlayer
-local function update_shadow(player)
-  if player.vehicle.prototype.name == "c5-galaxy-flying" then
-    local speed = player.vehicle.speed * 60 * 3.6
-
-    local pos = player.vehicle.position
+---@param plane LuaEntity
+local function update_shadow(plane)
+  if plane.prototype.name == "c5-galaxy-flying" then
+    local pos = plane.position
     -- Shadow lags 1 frame behind, so we add the speed (conveniently in dist/tick)
-    pos.x = pos.x + player.vehicle.speed * math.sin(player.vehicle.orientation * 2 * math.pi)
-    pos.y = pos.y + player.vehicle.speed * -math.cos(player.vehicle.orientation * 2 * math.pi)
+    pos.x = pos.x + plane.speed * math.sin(plane.orientation * 2 * math.pi)
+    pos.y = pos.y + plane.speed * -math.cos(plane.orientation * 2 * math.pi)
 
-    local kmh_above_takeoff = player.vehicle.speed * 60 * 3.6 - settings.global["takeoff-speed-kmh"].value
+    local kmh_above_takeoff = plane.speed * 60 * 3.6 - settings.global["takeoff-speed-kmh"].value
     local height = settings.global["height-per-kmh"].value * kmh_above_takeoff
     pos.x = pos.x + height * math.tan(30 / 180 * math.pi)
     local fadeout_height = settings.global["shadow-fadeout-height"].value
     rendering.draw_animation {
       animation = "c5-galaxy-flying-shadow",
-      surface = player.surface,
+      surface = plane.surface,
       target = pos,
       render_layer = "smoke", -- Right below air-object
       tint = { 1, 1, 1, 0.5 * math.max(0.0, (fadeout_height - height) / fadeout_height) },
       animation_speed = 0,
-      animation_offset = orientation_to_idx(player.vehicle.orientation, 128),
+      animation_offset = orientation_to_idx(plane.orientation, 128),
       time_to_live = 2,
     }
   end
 end
 
+---@param plane LuaEntity
+local function tick_plane(plane)
+  -- Backwards speed check
+  local min_speed = -30 / (60 * 3.6)
+  if plane.speed < min_speed then
+    plane.speed = min_speed
+  end
+end
+
+---@param plane LuaEntity
+local function tick_plane_grounded(plane)
+  if plane.speed == 0 then
+    local tile = plane.surface.get_tile(plane.position)
+    local cliff = plane.surface.find_entity("cliff", plane.position)
+    if cliff or tile.collides_with("water-tile") then
+      local driver = plane.get_driver()
+      local passenger = plane.get_passenger()
+      if driver and not driver.is_player() then driver.die() end
+      if passenger and not passenger.is_player() then passenger.die() end
+      plane.die()
+      return
+    end
+  end
+
+  -- This needs to be the last call in the function since the code before relies on the plane being grounded
+  if plane.speed * 60 * 3.6 > settings.global["takeoff-speed-kmh"].value then
+    swap_plane_prototype("c5-galaxy-grounded", "c5-galaxy-flying", plane)
+  end
+end
+
+---@param plane LuaEntity
+local function tick_plane_flying(plane)
+  update_shadow(plane)
+
+  -- This needs to be the last call in the function since the code before relies on the plane flying
+  if plane.speed * 60 * 3.6 < settings.global["takeoff-speed-kmh"].value then
+    swap_plane_prototype("c5-galaxy-flying", "c5-galaxy-grounded", plane)
+  end
+end
+
 script.on_event(
   defines.events.on_tick,
+  ---@param e EventData.on_tick
   function(e)
-    for index, player in pairs(game.connected_players) do
-      if player and player.driving and player.vehicle and player.surface then
-        if starts_with(player.vehicle.name, "c5-galaxy-") then
-          -- Speed check
-          local max_speed = 500 / (60 * 3.6)
-          local min_speed = -25 / (60 * 3.6)
-          if player.vehicle.speed > max_speed then
-            player.vehicle.speed = max_speed
-          elseif player.vehicle.speed < min_speed then
-            player.vehicle.speed = min_speed
-          end
-        end
-
-        if player.vehicle.name == "c5-galaxy-grounded" then
-          if player.vehicle.speed * 60 * 3.6 > settings.global["takeoff-speed-kmh"].value then
-            local old_riding_state = player.riding_state
-            swap_plane_prototype("c5-galaxy-grounded", "c5-galaxy-flying", player)
-            player.riding_state = old_riding_state
-          end
-
-          if player.vehicle.speed == 0 then
-            local tile = player.surface.get_tile(player.vehicle.position)
-            local cliff = player.surface.find_entity("cliff", player.vehicle.position)
-            if cliff or tile.collides_with("water-tile") then
-              local vehicle = player.vehicle
-              local driver = vehicle.get_driver()
-              local passenger = vehicle.get_passenger()
-              if driver then driver.die() end
-              if passenger then passenger.die() end
-              vehicle.die()
-            end
-          end
-        elseif player.vehicle.name == "c5-galaxy-flying" then
-          if player.vehicle.speed * 60 * 3.6 < settings.global["takeoff-speed-kmh"].value then
-            local old_riding_state = player.riding_state
-            swap_plane_prototype("c5-galaxy-flying", "c5-galaxy-grounded", player)
-            player.riding_state = old_riding_state
-          end
-        end
-
-        update_shadow(player)
+    for _, surface in pairs(game.surfaces) do
+      for _, plane_grounded in ipairs(surface.find_entities_filtered { name = "c5-galaxy-grounded" }) do
+        tick_plane(plane_grounded)
+        tick_plane_grounded(plane_grounded)
+      end
+      for _, plane_flying in ipairs(surface.find_entities_filtered { name = "c5-galaxy-flying" }) do
+        tick_plane(plane_flying)
+        tick_plane_flying(plane_flying)
       end
     end
   end
@@ -155,9 +162,8 @@ script.on_event(
         local driver = e.entity.get_driver()
         local passenger = e.entity.get_passenger()
         if not driver and passenger then
+          -- TODO: Test if really necessary
           e.entity.set_driver(passenger)
-        elseif not driver and not passenger then
-          e.entity.die()
         end
       end
     end

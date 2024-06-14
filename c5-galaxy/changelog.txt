@@ -36,3 +36,20 @@ Version: 1.0.7
 Date: 2024-06-13
   Changes:
     - Increased backwards speed
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2024-06-14
+  Changes:
+    - Increased airborne plane selection priority
+    - Exiting a flying plane no longer kills the plane and player
+    - Biters ignore flying planes
+    - Changed height-per-kmh setting default value
+  Balancing:
+    - Forward speed is now controlled by standard factorio vehicle physics instead of a hard limit
+    - Grounded plane friction is now fully affected by terrain friction
+    - Airborne plane is no longer affected by terrain friction
+    - Backwards speed increased from 25 to 30 km/h
+    - Increased fuel consumption from 8MW to 12MW
+    - Increased weight from 50000 to 60000
+    - Doubled energy per hit point
+    - Changed resistances

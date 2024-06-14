@@ -1,5 +1,12 @@
 #/usr/bin/env bash
 
+if [ -d factorio ]; then
+    :
+else
+    echo "Error: No factorio directory"
+    exit 1
+fi
+
 ln -sfT ../../c5-galaxy factorio/mods/c5-galaxy
 
 npm i factoriomod-debug
