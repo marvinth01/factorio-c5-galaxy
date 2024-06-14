@@ -1,11 +1,9 @@
-data:extend { {
-  type = "trigger-target-type",
-  name = "high-altitude-unit",
-} }
-
 local make_plane = require("prototypes.make_plane")
 local plane_grounded = make_plane(true)
 local plane_flying = make_plane(false)
+
+-- Allow disabling players as military targets when in an airborne plane
+data.raw["character"]["character"].allow_run_time_change_of_is_military_target = true
 
 -- Shadow animation
 local shadow_anim = plane_flying.animation.layers[2]

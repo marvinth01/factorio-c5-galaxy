@@ -141,14 +141,26 @@ script.on_event(
   ---@param e EventData.on_tick
   function(e)
     for _, player in pairs(game.connected_players) do
-      if player and player.driving and player.vehicle and player.surface then
-        if starts_with(player.vehicle.name, "c5-galaxy-") then
-          tick_plane(player.vehicle)
-          if player.vehicle.name == "c5-galaxy-grounded" then
-            tick_plane_grounded(player.vehicle)
-          elseif player.vehicle.name == "c5-galaxy-flying" then
-            tick_plane_flying(player.vehicle)
+      if player
+          and player.driving
+          and player.vehicle
+          and starts_with(player.vehicle.name, "c5-galaxy-")
+      then
+        tick_plane(player.vehicle)
+        if player.vehicle.name == "c5-galaxy-grounded" then
+          if player.character then
+            player.character.is_military_target = true
           end
+          tick_plane_grounded(player.vehicle)
+        elseif player.vehicle.name == "c5-galaxy-flying" then
+          if player.character then
+            player.character.is_military_target = false
+          end
+          tick_plane_flying(player.vehicle)
+        end
+      else
+        if player.character then
+          player.character.is_military_target = true
         end
       end
     end

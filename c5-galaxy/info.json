@@ -1,9 +1,10 @@
 {
   "name": "c5-galaxy",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "title": "C5 Galaxy Strategic Cargo Plane",
   "author": "Marvinth01",
   "factorio_version": "1.1",
+  "dependencies": ["base >= 1.1"],
   "homepage": "https://github.com/marvinth01/factorio-c5-galaxy",
   "description": "Adds the C5 Galaxy strategic cargo plane to transport large amounts of cargo across long distances."
 }

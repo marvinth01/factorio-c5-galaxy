@@ -19,7 +19,6 @@ local function make_plane(grounded)
     plane.terrain_friction_modifier = 0.0
     plane.braking_power = "32MW"
     plane.selection_priority = 51
-    plane.trigger_target_mask = { "high-altitude-unit" }
   end
   plane.consumption = "12MW"
   plane.effectivity = 0.8
