@@ -53,3 +53,11 @@ Date: 2024-06-14
     - Increased weight from 50000 to 60000
     - Doubled energy per hit point
     - Changed resistances
+---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2024-06-14
+  Bugfixes:
+    - Fixed horrible performance of previous release
+    - Takeoff and landing no longer fully heals the plane
+  Changes:
+    - Exiting a flying plane will once again kill the plane and player

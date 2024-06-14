@@ -62,6 +62,7 @@ local function swap_plane_prototype(name_from, name_to, plane)
   new.speed = old.speed
   new.orientation = old.orientation
   new.riding_state = old.riding_state
+  new.health = old.health
 
   local driver = old.get_driver()
   local passenger = old.get_passenger()
@@ -139,14 +140,16 @@ script.on_event(
   defines.events.on_tick,
   ---@param e EventData.on_tick
   function(e)
-    for _, surface in pairs(game.surfaces) do
-      for _, plane_grounded in ipairs(surface.find_entities_filtered { name = "c5-galaxy-grounded" }) do
-        tick_plane(plane_grounded)
-        tick_plane_grounded(plane_grounded)
-      end
-      for _, plane_flying in ipairs(surface.find_entities_filtered { name = "c5-galaxy-flying" }) do
-        tick_plane(plane_flying)
-        tick_plane_flying(plane_flying)
+    for _, player in pairs(game.connected_players) do
+      if player and player.driving and player.vehicle and player.surface then
+        if starts_with(player.vehicle.name, "c5-galaxy-") then
+          tick_plane(player.vehicle)
+          if player.vehicle.name == "c5-galaxy-grounded" then
+            tick_plane_grounded(player.vehicle)
+          elseif player.vehicle.name == "c5-galaxy-flying" then
+            tick_plane_flying(player.vehicle)
+          end
+        end
       end
     end
   end
@@ -162,8 +165,9 @@ script.on_event(
         local driver = e.entity.get_driver()
         local passenger = e.entity.get_passenger()
         if not driver and passenger then
-          -- TODO: Test if really necessary
           e.entity.set_driver(passenger)
+        elseif not driver and not passenger then
+          e.entity.die()
         end
       end
     end
