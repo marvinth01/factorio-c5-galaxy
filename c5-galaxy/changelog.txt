@@ -82,3 +82,8 @@ Date: 2024-07-19
     - Reduced research cost
   Optimizations:
     - Improved plane tracking (no longer player-based).
+---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 2024-07-19
+  Bugfixes:
+    - Fixed pathfinding crash when circles couldn't be smoothly connected with a line

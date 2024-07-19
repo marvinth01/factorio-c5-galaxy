@@ -176,7 +176,21 @@ function M.pathfind(queue)
       local dirvec = vec.sub(b.center, a.center)
       local dist = vec.len(dirvec)
       local raddiff = a.winding * a.radius - b.winding * b.radius
-      local oridiff = math.asin(raddiff / dist) / (2.0 * math.pi)
+      local arcsin_arg = raddiff / dist
+      if arcsin_arg < -1 or arcsin_arg > 1 or dist == 0 then
+        -- Can't properly connect the 2 circles, create circle not intersecting the offending 2 circles
+        table.insert(path, i + 1, {
+          type = "circle",
+          speed = a.speed,
+          center = vec.add(a.center, { x = 2 * (a.radius + b.radius), y = 0 }),
+          radius = a.radius,
+          orientation = 0.0, -- Doesn't matter, will be overwritten
+          winding = b.winding, -- Shouldn't matter
+        })
+        -- Don't increment radius, we will want to create the 2 line connections to and from the auxiliary circle
+        goto continue
+      end
+      local oridiff = math.asin(arcsin_arg) / (2.0 * math.pi)
       local conn_orientation = vec.to_orientation(dirvec) + oridiff
 
       table.insert(path, i + 1, {
@@ -188,6 +202,7 @@ function M.pathfind(queue)
       path[i].orientation = conn_orientation
     end
     i = i + 1
+    ::continue::
   end
   return path
 end
