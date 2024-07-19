@@ -1,6 +1,7 @@
+---@param name string
 ---@param grounded boolean
 ---@return data.CarPrototype
-local function make_plane(grounded)
+local function make_plane(name, grounded)
   local plane = table.deepcopy(data.raw["car"]["car"])
 
   if not grounded then
@@ -8,13 +9,12 @@ local function make_plane(grounded)
     table.insert(plane.flags, "no-automated-item-removal")
   end
 
+  plane.name = name
   if grounded then
-    plane.name = "c5-galaxy-grounded"
     plane.collision_mask = { "player-layer", "train-layer" }
     plane.terrain_friction_modifier = 1.0
     plane.braking_power = "5MW"
   else
-    plane.name = "c5-galaxy-flying"
     plane.collision_mask = {}
     plane.terrain_friction_modifier = 0.0
     plane.braking_power = "32MW"
@@ -40,8 +40,8 @@ local function make_plane(grounded)
   plane.immune_to_tree_impacts = false
   plane.immune_to_rock_impacts = false
   plane.immune_to_cliff_impacts = false
-  plane.collision_box = { { -3.0, -8.5 }, { 3.0, 8.5 } }
-  plane.selection_box = { { -3.0, -8.5 }, { 3.0, 8.5 } }
+  plane.collision_box = { { -2.5, -8.5 }, { 2.5, 8.5 } }
+  plane.selection_box = { { -2.5, -8.5 }, { 2.5, 8.5 } }
 
   if grounded then
     plane.resistances = {
@@ -133,6 +133,7 @@ local function make_plane(grounded)
   plane.light_animation = nil
   plane.icon = "__c5-galaxy__/graphics/icon.png"
   plane.icon_size = 512
+  plane.icon_mipmaps = 1
   plane.turret_animation = nil
   plane.turret_rotation_speed = nil
   plane.turret_return_timeout = nil

@@ -66,3 +66,19 @@ Version: 1.1.2
 Date: 2024-06-14
   Bugfixes:
     - Biters now really don't target planes with players in them
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2024-07-19
+  Major Features:
+    - Added autopilot.
+      Includes path planning between parking spots, ground waypoints, and takeoff & landing points.
+  Minor Features:
+    - Planes now reveal the map around them.
+  Changes:
+    - Reduced plane width from 6 to 5
+    - Planes can now function without a player inside.
+    - Exiting a flying plane no longer kills the plane and player.
+    - Removed settings since they would mess with the autopilot system.
+    - Reduced research cost
+  Optimizations:
+    - Improved plane tracking (no longer player-based).
