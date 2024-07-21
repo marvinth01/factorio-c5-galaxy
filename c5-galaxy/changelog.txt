@@ -87,3 +87,11 @@ Version: 2.0.1
 Date: 2024-07-19
   Bugfixes:
     - Fixed pathfinding crash when circles couldn't be smoothly connected with a line
+---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2024-07-21
+  Changes:
+    - Increased taxi speed to 40 km/h (also slightly increased turn radius accordingly)
+    - Mitigated plane oscillation when following straight paths
+    - Path planning lines are now dotted
+    - Fixed naming inconsistencies
