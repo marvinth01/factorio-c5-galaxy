@@ -3,10 +3,11 @@ local M = {}
 local vec = require("lua.vecmath")
 
 local SPEED_PARKING = 10 / (3.6 * 60)
-local SPEED_TAXI = 30 / (3.6 * 60)
+local SPEED_TAXI = 40 / (3.6 * 60)
 local SPEED_APPROACH = 180 / (3.6 * 60)
 
-local TURNRADIUS_TAXI = 25
+local TURNRADIUS_PARKING = 20
+local TURNRADIUS_TAXI = 27
 local TURNRADIUS_APPROACH = 75
 local TURNRADIUS_CRUISE = 125
 
@@ -83,7 +84,7 @@ function M.pathfind(queue)
       table.insert(path, {
         type = "line",
         speed = SPEED_TAXI,
-        a = approachpoint(-30),
+        a = approachpoint(-50),
         b = approachpoint(-10),
         precision_turn_radius = TURNRADIUS_TAXI,
       })
@@ -92,14 +93,14 @@ function M.pathfind(queue)
         speed = SPEED_PARKING,
         a = approachpoint(-10),
         b = marker.position,
-        precision_turn_radius = TURNRADIUS_TAXI,
+        precision_turn_radius = TURNRADIUS_PARKING,
       })
       table.insert(path, {
         type = "line",
         speed = 0,
         a = marker.position,
         b = approachpoint(10),
-        precision_turn_radius = TURNRADIUS_TAXI,
+        precision_turn_radius = TURNRADIUS_PARKING,
       })
     elseif marker.name == "taxi-marker" then
       local taxi_line_start = vec.add(

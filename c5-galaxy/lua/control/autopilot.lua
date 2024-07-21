@@ -87,6 +87,8 @@ function M.tick_player(player)
           surface = marker.surface,
           time_to_live = 2,
           players = { player },
+          dash_length = 5,
+          gap_length = 3,
         }
       end
     end

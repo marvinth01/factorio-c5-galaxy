@@ -60,11 +60,13 @@ function M.follow(plane, segment)
     -- Orientation stuff
     local rightnessdir = vec.rotclock90(pathdir)
     local rightness = vec.dot(vec.sub(plane.position, segment.a), rightnessdir)
+    if math.abs(rightness) < 0.1 then
+      rightness = 0
+    end
     local local_orientation_target
     if segment.precision_turn_radius ~= nil then
       local rightness_radius_adjusted = rightness / segment.precision_turn_radius
       local x = math.max(-1, math.min(1, rightness_radius_adjusted))
-      local_orientation_target = 0.25 * (sign(x) * (1 - math.sqrt(1 - square(1 - math.abs(x)))) - sign(x))
       local_orientation_target = 0.25 * (sign(x) * math.asin(1 - math.abs(x)) / (0.5 * math.pi) - sign(x))
     else
       local_orientation_target = math.atan(0.05 * rightness) / (-2.0 * math.pi)
