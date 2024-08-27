@@ -9,8 +9,8 @@ local item = {
   icon_size = 32,
   icon_mipmaps = 1,
 
-  selection_mode = "any-entity",
-  alt_selection_mode = "nothing",
+  selection_mode = { "entity-with-owner" },
+  alt_selection_mode = { "nothing" },
   selection_color = { 127, 127, 255, 127 },
   alt_selection_color = { 127, 127, 255, 127 },
   selection_cursor_box_type = "pair",

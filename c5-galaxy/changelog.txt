@@ -95,3 +95,8 @@ Date: 2024-07-21
     - Mitigated plane oscillation when following straight paths
     - Path planning lines are now dotted
     - Fixed naming inconsistencies
+---------------------------------------------------------------------------------------------------
+Version: 2.1.1
+Date: 2024-08-27
+  Bugfixes:
+    - The path planning tool can no longer select entity ghosts
