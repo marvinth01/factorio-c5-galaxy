@@ -67,12 +67,12 @@ function M.circle_get_tangent_pos(center, radius, winding, orientation)
   return exit_point
 end
 
----@param queue LuaEntity[]
+---@param markers LuaEntity[]
 ---@return PathSegment[]
-function M.pathfind(queue)
+function M.pathfind(markers)
   ---@type PathSegment[]
   local path = {}
-  for _, marker in ipairs(queue) do
+  for _, marker in ipairs(markers) do
     if marker.name == "parking-marker" then
       local dirvec = vec.from_orientation(marker.orientation)
       local function approachpoint(dist)
@@ -236,16 +236,6 @@ function M.draw_segment(segment, color, surface, players)
       players = players,
     }
   end
-end
-
----Connects 2 circles with a line, respecting windings
----You should update the orientation of the 1st circle afterwards
----Returns nil if not possible
----@param circle1 CirclePathSegment
----@param circle2 CirclePathSegment
----@param speed float|nil
----@return LinePathSegment|nil
-local function connect_circles(circle1, circle2, speed)
 end
 
 return M

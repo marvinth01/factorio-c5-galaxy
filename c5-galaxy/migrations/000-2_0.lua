@@ -39,6 +39,6 @@ for _, force in pairs(game.forces) do
     recipes["taxi-marker"].enabled = true
     recipes["takeoff-marker"].enabled = true
     recipes["landing-marker"].enabled = true
-    recipes["c5-galaxy-controller"].enabled = true
+    recipes["c5-galaxy-tool-path"].enabled = true
   end
 end

@@ -1,0 +1,14 @@
+{
+  "item": [
+    [
+      "c5-galaxy-controller",
+      "c5-galaxy-tool-path"
+    ]
+  ],
+  "recipe": [
+    [
+      "c5-galaxy-controller",
+      "c5-galaxy-tool-path"
+    ]
+  ]
+}
