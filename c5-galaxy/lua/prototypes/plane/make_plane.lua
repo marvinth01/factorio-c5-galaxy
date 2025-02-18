@@ -14,11 +14,13 @@ local function make_plane(name, grounded)
     plane.collision_mask = { "player-layer", "train-layer" }
     plane.terrain_friction_modifier = 1.0
     plane.braking_power = "5MW"
+    plane.render_layer = "wires-above"
   else
     plane.collision_mask = {}
     plane.terrain_friction_modifier = 0.0
     plane.braking_power = "32MW"
     plane.selection_priority = 51
+    plane.render_layer = "air-object"
   end
   plane.consumption = "12MW"
   plane.effectivity = 0.8
@@ -97,7 +99,6 @@ local function make_plane(name, grounded)
   end
 
   plane.water_reflection = nil
-  plane.render_layer = "air-object"
   plane.animation = {
     layers = {
       {

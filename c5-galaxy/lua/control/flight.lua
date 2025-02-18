@@ -1,6 +1,7 @@
 local M = {}
 
 local constants = require("lua.constants")
+local state = require("lua.control.state")
 
 ---@param orientation double
 ---@param n_idx uint
@@ -33,9 +34,10 @@ end
 local function swap_plane_prototype(name_from, name_to, plane)
   assert(plane.valid)
   assert(plane.name == name_from)
-  local old = plane
-  assert(old)
-  local new = plane.surface.create_entity {
+  local old_plane = plane
+  assert(old_plane)
+  state.suppress_registration = true
+  local new_plane = plane.surface.create_entity {
     name = name_to,
     position = plane.position,
     direction = plane.direction,
@@ -43,37 +45,40 @@ local function swap_plane_prototype(name_from, name_to, plane)
     create_build_effect_smoke = false,
     raise_built = true,
   }
-  assert(new)
+  state.suppress_registration = false
+  assert(new_plane)
 
-  if old.burner then
-    assert(new.burner)
-    new.burner.currently_burning = old.burner.currently_burning
-    new.burner.remaining_burning_fuel = old.burner.remaining_burning_fuel
+  if old_plane.burner then
+    assert(new_plane.burner)
+    new_plane.burner.currently_burning = old_plane.burner.currently_burning
+    new_plane.burner.remaining_burning_fuel = old_plane.burner.remaining_burning_fuel
   end
-  copy_inventory(old.get_inventory(defines.inventory.fuel), new.get_inventory(defines.inventory.fuel))
-  copy_inventory(old.get_inventory(defines.inventory.car_trunk), new.get_inventory(defines.inventory.car_trunk))
+  copy_inventory(old_plane.get_inventory(defines.inventory.fuel), new_plane.get_inventory(defines.inventory.fuel))
+  copy_inventory(old_plane.get_inventory(defines.inventory.car_trunk), new_plane.get_inventory(defines.inventory.car_trunk))
 
-  new.destructible = old.destructible
-  new.operable = old.operable
-  new.effectivity_modifier = old.effectivity_modifier
-  new.consumption_modifier = old.consumption_modifier
-  new.friction_modifier = old.friction_modifier
-  new.speed = old.speed
-  new.orientation = old.orientation
-  new.riding_state = old.riding_state
-  new.health = old.health
+  new_plane.destructible = old_plane.destructible
+  new_plane.operable = old_plane.operable
+  new_plane.effectivity_modifier = old_plane.effectivity_modifier
+  new_plane.consumption_modifier = old_plane.consumption_modifier
+  new_plane.friction_modifier = old_plane.friction_modifier
+  new_plane.speed = old_plane.speed
+  new_plane.orientation = old_plane.orientation
+  new_plane.riding_state = old_plane.riding_state
+  new_plane.health = old_plane.health
 
-  local driver = old.get_driver()
-  local passenger = old.get_passenger()
+  local driver = old_plane.get_driver()
+  local passenger = old_plane.get_passenger()
 
   -- Move over the plane's information (e.g. autopilot data)
-  global.planes[name_to][new.unit_number] = global.planes[name_from][old.unit_number]
-  global.planes[name_to][new.unit_number].entity = new
-  global.planes[name_from][old.unit_number] = nil
+  local plane_id = global.state.entity_to_plane_id[plane.unit_number]
+  global.state.plane_data[plane_id].entity = new_plane
+  global.state.entity_to_plane_id[new_plane.unit_number] = plane_id
+  -- Deleting will be done on the next cleanup, no need to do it here
+  --global.state.entity_to_plane_id[old_plane.unit_number] = nil -- Hopefully doing this this early won't lead to problems
 
-  old.destroy { raise_destroy = true }
-  new.set_driver(driver)
-  new.set_passenger(passenger)
+  old_plane.destroy { raise_destroy = true }
+  new_plane.set_driver(driver)
+  new_plane.set_passenger(passenger)
 end
 
 ---@param plane LuaEntity
@@ -112,12 +117,11 @@ function M.tick_plane(plane, tick)
 
   -- Scan chunks
   if (plane.unit_number + tick) % 60 == 0 then
-  plane.force.chart(plane.surface, {
-    {x = plane.position.x - 128, y = plane.position.y - 128},
-    {x = plane.position.x + 128, y = plane.position.y + 128},
-  })
+    plane.force.chart(plane.surface, {
+      { x = plane.position.x - 128, y = plane.position.y - 128 },
+      { x = plane.position.x + 128, y = plane.position.y + 128 },
+    })
   end
-
 end
 
 ---@param plane LuaEntity
@@ -143,19 +147,13 @@ function M.tick_plane_grounded_takeoff(plane)
 end
 
 ---@param plane LuaEntity
-function M.tick_plane_flying_shadow_landing(plane)
+function M.tick_plane_flying_landing_shadow(plane)
   update_shadow(plane)
 
   -- This needs to be the last call in the function since the code before relies on the plane flying
   if plane.speed < constants.takeoff_speed then
     swap_plane_prototype("c5-galaxy-flying", "c5-galaxy-grounded", plane)
   end
-end
-
-local valid_pairs = require("tracking").valid_pairs
-
----@param e EventData.on_tick
-function M.on_tick(e)
 end
 
 return M

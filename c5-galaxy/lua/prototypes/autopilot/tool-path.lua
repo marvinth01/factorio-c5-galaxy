@@ -1,11 +1,11 @@
 ---@type data.SelectionToolPrototype
 local item = {
   type = "selection-tool",
-  name = "c5-galaxy-controller",
+  name = "c5-galaxy-tool-path",
   subgroup = "transport",
-  order = "b[personal-transport]-d[c5-galaxy]-c[controller]",
+  order = "b[personal-transport]-d[c5-galaxy]-c[tool]-a[path]",
   stack_size = 1,
-  icon = "__c5-galaxy__/graphics/controller.png",
+  icon = "__c5-galaxy__/graphics/tool-path.png",
   icon_size = 32,
   icon_mipmaps = 1,
 
@@ -25,10 +25,10 @@ data:extend { item }
 ---@type data.RecipePrototype
 local recipe = {
   type = "recipe",
-  name = "c5-galaxy-controller",
+  name = "c5-galaxy-tool-path",
   enabled = false,
   energy_required = 0.5,
   ingredients = { { "processing-unit", 1 } },
-  result = "c5-galaxy-controller",
+  result = "c5-galaxy-tool-path",
 }
 data:extend { recipe }

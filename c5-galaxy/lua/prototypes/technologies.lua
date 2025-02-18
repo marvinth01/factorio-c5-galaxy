@@ -21,7 +21,7 @@ local plane_tech = {
     { type = "unlock-recipe", recipe = "taxi-marker" },
     { type = "unlock-recipe", recipe = "takeoff-marker" },
     { type = "unlock-recipe", recipe = "landing-marker" },
-    { type = "unlock-recipe", recipe = "c5-galaxy-controller" },
+    { type = "unlock-recipe", recipe = "c5-galaxy-tool-path" },
   },
 }
 data:extend { plane_tech }

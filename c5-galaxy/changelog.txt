@@ -100,3 +100,9 @@ Version: 2.1.1
 Date: 2024-08-27
   Bugfixes:
     - The path planning tool can no longer select entity ghosts
+---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2025-02-18
+  Scripting:
+    - Changed the name of c5-galaxy-controller to c5-galaxy-tool-path
+    - Changed how internal state is stored and planes are tracked

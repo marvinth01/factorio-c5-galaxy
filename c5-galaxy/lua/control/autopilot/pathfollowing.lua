@@ -11,10 +11,6 @@ local function sign(x)
   end
 end
 
-local function square(x)
-  return x * x
-end
-
 local SPEED_TOLERANCE = 0.5 / (3.6 * 60)
 
 ---@param current number

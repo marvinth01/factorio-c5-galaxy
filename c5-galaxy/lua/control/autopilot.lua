@@ -6,17 +6,7 @@ local pathfollowing = require("autopilot.pathfollowing")
 ---@class AutopilotData
 ---@field path_segments PathSegment[]
 
----@class SelectionState
----@field plane LuaEntity
----@field queue LuaEntity[]
-
-function M.on_init()
-  ---Maps player names to their selection state
-  ---@type table<string, SelectionState>
-  global.player_selection = {}
-end
-
----@param info PlaneInfo
+---@param info PlaneData
 function M.tick_plane(info)
   if not info.autopilot_data then
     return
@@ -35,7 +25,7 @@ function M.tick_plane(info)
 
   local players_holding_controller = {}
   for _, player in pairs(game.players) do
-    if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.name == "c5-galaxy-controller" then
+    if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.name == "c5-galaxy-tool-path" then
       table.insert(players_holding_controller, player)
     end
   end
@@ -47,38 +37,52 @@ function M.tick_plane(info)
   end
 end
 
+---Checks the path planning state of a player and sets it to nil if it's invalid
 ---@param player LuaPlayer
-function M.tick_player(player)
-  if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.name == "c5-galaxy-controller" then
-    -- Validate selection (check if marker entities might have been destroyed)
-    local selection = global.player_selection[player.name]
-    if selection then
-      local valid = true
-      if not selection.plane.valid then valid = false end
-      for _, marker in ipairs(selection.queue) do
-        if not marker.valid then valid = false end
-      end
-      if not valid then
-        global.player_selection[player.name] = nil
-        player.print({ "c5-galaxy.error-path-marker-destroyed" })
+function M.validate_player_selection(player)
+  local selection = global.state.player_path_planning[player.index]
+  if selection then
+    local plane_data = global.state.plane_data[selection.plane_id]
+    local valid = true
+    if not (
+          plane_data
+          and plane_data.entity.valid
+        ) then
+      valid = false
+    end
+    for _, marker in ipairs(selection.markers) do
+      if not marker.valid then
+        valid = false
       end
     end
+    if not valid then
+      global.state.player_path_planning[player.index] = nil
+      player.print({ "c5-galaxy.error-path-marker-destroyed" })
+    end
+  end
+end
+
+---@param player LuaPlayer
+function M.tick_player(player)
+  if player.cursor_stack and player.cursor_stack.valid_for_read and player.cursor_stack.name == "c5-galaxy-tool-path" then
+    M.validate_player_selection(player)
 
     -- Draw path currently being planned if player is holding a controller
-    local selection = global.player_selection[player.name]
+    local selection = global.state.player_path_planning[player.index]
     if selection then
+      local plane = global.state.plane_data[selection.plane_id].entity
       local color = { 255, 31, 127, 127 }
       rendering.draw_circle {
         color = color,
         width = 15,
         radius = 10,
-        target = selection.plane,
-        surface = selection.plane.surface,
+        target = plane,
+        surface = plane.surface,
         time_to_live = 2,
         players = { player },
       }
-      for i, marker in ipairs(selection.queue) do
-        local prev = selection.queue[i - 1] or selection.plane
+      for i, marker in ipairs(selection.markers) do
+        local prev = selection.markers[i - 1] or plane
         rendering.draw_line {
           color = color,
           width = 15,
@@ -98,7 +102,9 @@ end
 ---@param player LuaPlayer
 ---@param marker LuaEntity
 local function add_marker(player, marker)
-  local selection = global.player_selection[player.name]
+  M.validate_player_selection(player)
+
+  local selection = global.state.player_path_planning[player.index]
   if not selection then
     player.print({ "c5-galaxy.error-no-plane-selected" })
     return
@@ -109,12 +115,12 @@ local function add_marker(player, marker)
       or marker.name == "taxi-marker"
       or marker.name == "takeoff-marker"
   then
-    if #selection.queue > 0 and selection.queue[#selection.queue].name == "takeoff-marker" then
+    if #selection.markers > 0 and selection.markers[#selection.markers].name == "takeoff-marker" then
       player.print({ "c5-galaxy.error-invalid-after-takeoff-marker" })
       return
     end
   elseif marker.name == "landing-marker" then
-    if #selection.queue == 0 or selection.queue[#selection.queue].name ~= "takeoff-marker" then
+    if #selection.markers == 0 or selection.markers[#selection.markers].name ~= "takeoff-marker" then
       player.print({ "c5-galaxy.error-landing-marker-only-after-takeoff-marker" })
       return
     end
@@ -122,21 +128,21 @@ local function add_marker(player, marker)
     assert(false, "Invalid marker type: " .. marker.name)
   end
 
-  table.insert(selection.queue, marker)
+  table.insert(selection.markers, marker)
 
   -- Check if path ready (should maybe be a gui action in the future)
   if marker.name == "parking-marker" then
-    global.planes[selection.plane.name][selection.plane.unit_number].autopilot_data = {
-      path_segments = pathfinding.pathfind(selection.queue)
+    global.state.plane_data[selection.plane_id].autopilot_data = {
+      path_segments = pathfinding.pathfind(selection.markers)
     }
-    global.player_selection[player.name] = nil
+    global.state.player_path_planning[player.index] = nil
   end
 end
 
 ---@param e EventData.on_player_selected_area
 function M.on_player_selected_area(e)
   -- Make sure we are using the autopilot controller
-  if e.item ~= "c5-galaxy-controller" then
+  if e.item ~= "c5-galaxy-tool-path" then
     return
   end
 
@@ -177,13 +183,10 @@ function M.on_player_selected_area(e)
 
   ---@cast entity LuaEntity
 
-  if global.player_selection[player.name]
-      and not global.player_selection[player.name].plane.valid then
-    global.player_selection[player.name] = nil
-  end
+  M.validate_player_selection(player)
 
   if entity.name == "c5-galaxy-grounded" or entity.name == "c5-galaxy-flying" then
-    global.player_selection[player.name] = { plane = entity, queue = {} }
+    global.state.player_path_planning[player.index] = { plane_id = global.state.entity_to_plane_id[entity.unit_number], markers = {} }
   elseif entity.name == "parking-marker"
       or entity.name == "taxi-marker"
       or entity.name == "takeoff-marker"
@@ -196,7 +199,7 @@ end
 ---@param e EventData.on_player_reverse_selected_area
 function M.on_player_reverse_selected_area(e)
   -- Make sure we are using the autopilot controller
-  if e.item ~= "c5-galaxy-controller" then
+  if e.item ~= "c5-galaxy-tool-path" then
     return
   end
 
@@ -204,7 +207,8 @@ function M.on_player_reverse_selected_area(e)
   for _, entity in pairs(e.entities) do
     if entity.name == "c5-galaxy-grounded" or entity.name == "c5-galaxy-flying" then
       player.print({ "c5-galaxy.message-player-aborting-plane-path" })
-      global.planes[entity.name][entity.unit_number].autopilot_data = nil
+      local plane_id = global.state.entity_to_plane_id[entity.unit_number]
+      global.state.plane_data[plane_id].autopilot_data = nil
       if entity.name == "c5-galaxy-grounded" then
         entity.riding_state = {
           acceleration = defines.riding.acceleration.braking,

@@ -75,7 +75,7 @@ add_marker(
   "__c5-galaxy__/graphics/parking-marker.png",
   128,
   "__c5-galaxy__/graphics/parking-icon.png",
-  "1"
+  "0"
 )
 add_marker(
   "taxi-marker",
