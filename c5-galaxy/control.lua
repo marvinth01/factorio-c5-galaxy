@@ -21,7 +21,7 @@ script.on_event(
 script.on_event(
   defines.events.on_built_entity,
   ---@param e EventData.on_built_entity
-  function(e) state.on_entity_created(e.created_entity) end
+  function(e) state.on_entity_created(e.entity) end
 )
 
 script.on_event(defines.events.on_tick,
@@ -29,7 +29,7 @@ script.on_event(defines.events.on_tick,
   function(e)
     state.cleanup()
 
-    for plane_id, plane_data in pairs(global.state.plane_data) do
+    for plane_id, plane_data in pairs(storage.state.plane_data) do
       assert(plane_data.entity.valid)
 
       local plane = plane_data.entity

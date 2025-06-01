@@ -1,5 +1,7 @@
 local collision_mask_util = require("collision-mask-util")
-local marker_mask = collision_mask_util.get_first_unused_layer()
+data:extend {
+  { type = "collision-layer", name = "c5_marker_mask" },
+}
 
 ---@param name string
 ---@param width number
@@ -18,7 +20,7 @@ local function add_marker(name, width, length, image_location, image_size, icon_
     build_grid_size = 1,
     selection_box = { { -halfwidth, -halflength }, { halfwidth, halflength } },
     collision_box = { { -halfwidth + 0.1, -halflength + 0.1 }, { halfwidth - 0.1, halflength - 0.1 } },
-    collision_mask = { marker_mask },
+    collision_mask = { layers = { c5_marker_mask = true } },
     selection_priority = 49,
     minable = {
       mining_time = 0.5,
@@ -32,7 +34,6 @@ local function add_marker(name, width, length, image_location, image_size, icon_
     render_layer = "lower-object",
     icon = icon_location,
     icon_size = 64,
-    icon_mipmaps = 1,
     picture = {
       sheet = {
         filename = image_location,
@@ -63,8 +64,8 @@ local function add_marker(name, width, length, image_location, image_size, icon_
     name = name,
     enabled = false,
     energy_required = 0.5,
-    ingredients = { { "processing-unit", 1 } },
-    result = name,
+    ingredients = { { type = "item", name = "processing-unit", amount = 1 } },
+    results = { { type = "item", name = name, amount = 1 } },
   }
   data:extend { recipe }
 end

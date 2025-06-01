@@ -24,7 +24,6 @@ plane_item.name = "c5-galaxy"
 plane_item.place_result = "c5-galaxy-grounded"
 plane_item.icon = "__c5-galaxy__/graphics/icon.png"
 plane_item.icon_size = 512
-plane_item.icon_mipmaps = 1
 plane_item.order = "b[personal-transport]-d[c5-galaxy]-a[plane]"
 data:extend { plane_item }
 
@@ -34,7 +33,13 @@ local recipe = {
   name = "c5-galaxy",
   enabled = false,
   energy_required = 20,
-  ingredients = { { "steel-plate", 200 }, { "low-density-structure", 50 }, { "processing-unit", 20 } },
-  result = "c5-galaxy",
+  ingredients = {
+    { type = "item", name = "steel-plate",           amount = 200 },
+    { type = "item", name = "low-density-structure", amount = 50 },
+    { type = "item", name = "processing-unit",       amount = 20 },
+  },
+  results = {
+    { type = "item", name = "c5-galaxy", amount = 1 },
+  },
 }
 data:extend { recipe }

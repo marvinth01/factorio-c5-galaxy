@@ -106,3 +106,9 @@ Date: 2025-02-18
   Scripting:
     - Changed the name of c5-galaxy-controller to c5-galaxy-tool-path
     - Changed how internal state is stored and planes are tracked
+---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2025-06-01
+  Changes:
+    - Updated for 2.0
+    - With space age enabled, minimum pressure is 700 hPa and max gravity 20 m/s^2

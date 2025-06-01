@@ -40,9 +40,9 @@ end
 ---Checks the path planning state of a player and sets it to nil if it's invalid
 ---@param player LuaPlayer
 function M.validate_player_selection(player)
-  local selection = global.state.player_path_planning[player.index]
+  local selection = storage.state.player_path_planning[player.index]
   if selection then
-    local plane_data = global.state.plane_data[selection.plane_id]
+    local plane_data = storage.state.plane_data[selection.plane_id]
     local valid = true
     if not (
           plane_data
@@ -56,7 +56,7 @@ function M.validate_player_selection(player)
       end
     end
     if not valid then
-      global.state.player_path_planning[player.index] = nil
+      storage.state.player_path_planning[player.index] = nil
       player.print({ "c5-galaxy.error-path-marker-destroyed" })
     end
   end
@@ -68,9 +68,9 @@ function M.tick_player(player)
     M.validate_player_selection(player)
 
     -- Draw path currently being planned if player is holding a controller
-    local selection = global.state.player_path_planning[player.index]
+    local selection = storage.state.player_path_planning[player.index]
     if selection then
-      local plane = global.state.plane_data[selection.plane_id].entity
+      local plane = storage.state.plane_data[selection.plane_id].entity
       local color = { 255, 31, 127, 127 }
       rendering.draw_circle {
         color = color,
@@ -104,7 +104,7 @@ end
 local function add_marker(player, marker)
   M.validate_player_selection(player)
 
-  local selection = global.state.player_path_planning[player.index]
+  local selection = storage.state.player_path_planning[player.index]
   if not selection then
     player.print({ "c5-galaxy.error-no-plane-selected" })
     return
@@ -132,10 +132,10 @@ local function add_marker(player, marker)
 
   -- Check if path ready (should maybe be a gui action in the future)
   if marker.name == "parking-marker" then
-    global.state.plane_data[selection.plane_id].autopilot_data = {
+    storage.state.plane_data[selection.plane_id].autopilot_data = {
       path_segments = pathfinding.pathfind(selection.markers)
     }
-    global.state.player_path_planning[player.index] = nil
+    storage.state.player_path_planning[player.index] = nil
   end
 end
 
@@ -186,7 +186,7 @@ function M.on_player_selected_area(e)
   M.validate_player_selection(player)
 
   if entity.name == "c5-galaxy-grounded" or entity.name == "c5-galaxy-flying" then
-    global.state.player_path_planning[player.index] = { plane_id = global.state.entity_to_plane_id[entity.unit_number], markers = {} }
+    storage.state.player_path_planning[player.index] = { plane_id = storage.state.entity_to_plane_id[entity.unit_number], markers = {} }
   elseif entity.name == "parking-marker"
       or entity.name == "taxi-marker"
       or entity.name == "takeoff-marker"
@@ -207,8 +207,8 @@ function M.on_player_reverse_selected_area(e)
   for _, entity in pairs(e.entities) do
     if entity.name == "c5-galaxy-grounded" or entity.name == "c5-galaxy-flying" then
       player.print({ "c5-galaxy.message-player-aborting-plane-path" })
-      local plane_id = global.state.entity_to_plane_id[entity.unit_number]
-      global.state.plane_data[plane_id].autopilot_data = nil
+      local plane_id = storage.state.entity_to_plane_id[entity.unit_number]
+      storage.state.plane_data[plane_id].autopilot_data = nil
       if entity.name == "c5-galaxy-grounded" then
         entity.riding_state = {
           acceleration = defines.riding.acceleration.braking,

@@ -11,12 +11,22 @@ local function make_plane(name, grounded)
 
   plane.name = name
   if grounded then
-    plane.collision_mask = { "player-layer", "train-layer" }
+    plane.collision_mask = {
+      layers = {
+        item = true,
+        object = true,
+        player = true,
+        water_tile = true,
+        elevated_rail = true,
+        is_object = true,
+        is_lower_object = true,
+      }
+    }
     plane.terrain_friction_modifier = 1.0
     plane.braking_power = "5MW"
     plane.render_layer = "wires-above"
   else
-    plane.collision_mask = {}
+    plane.collision_mask = { layers = {} }
     plane.terrain_friction_modifier = 0.0
     plane.braking_power = "32MW"
     plane.selection_priority = 51
@@ -32,8 +42,9 @@ local function make_plane(name, grounded)
   plane.weight = 60000
   plane.energy_per_hit_point = 4.0
   plane.inventory_size = 960
-  plane.burner = {
-    fuel_category = "chemical",
+  plane.energy_source = {
+    type = "burner",
+    fuel_categories = {"chemical"},
     effectivity = 1,
     fuel_inventory_size = 8,
   }
@@ -122,7 +133,6 @@ local function make_plane(name, grounded)
       },
     }
   }
-  plane.sound_scaling_ratio = 0.4
   plane.working_sound = {
     sound = { filename = "__c5-galaxy__/sounds/jet-loop-0_5.ogg", volume = 0.3 },
     --activate_sound = { filename = "__c5-galaxy__/sounds/jet-start.ogg", volume = 0.3 },
@@ -134,7 +144,6 @@ local function make_plane(name, grounded)
   plane.light_animation = nil
   plane.icon = "__c5-galaxy__/graphics/icon.png"
   plane.icon_size = 512
-  plane.icon_mipmaps = 1
   plane.turret_animation = nil
   plane.turret_rotation_speed = nil
   plane.turret_return_timeout = nil
@@ -154,6 +163,19 @@ local function make_plane(name, grounded)
     size = { 40, 40 },
     scale = 1.0
   }
+
+  if mods["space-age"] then
+    plane.surface_conditions = {
+      {
+        property = "pressure",
+        min = 700,
+      },
+      {
+        property = "gravity",
+        max = 20,
+      },
+    }
+  end
 
   return plane
 end

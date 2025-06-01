@@ -16,7 +16,7 @@ local M = {}
 
 function M.on_init()
   ---@type State
-  global.state = {
+  storage.state = {
     next_id = 0,
     plane_data = {},
     entity_to_plane_id = {},
@@ -26,8 +26,8 @@ end
 
 ---@return uint
 function M.new_id()
-  local id = global.state.next_id
-  global.state.next_id = global.state.next_id + 1
+  local id = storage.state.next_id
+  storage.state.next_id = storage.state.next_id + 1
   return id
 end
 
@@ -36,30 +36,30 @@ M.suppress_registration = false
 
 ---@param plane LuaEntity
 function M.register_plane(plane)
-  assert(global.state.entity_to_plane_id[plane.unit_number] == nil)
+  assert(storage.state.entity_to_plane_id[plane.unit_number] == nil)
   if not M.suppress_registration then
     local plane_id = M.new_id()
-    global.state.plane_data[plane_id] = { entity = plane, autopilot_data = nil }
-    global.state.entity_to_plane_id[plane.unit_number] = plane_id
+    storage.state.plane_data[plane_id] = { entity = plane, autopilot_data = nil }
+    storage.state.entity_to_plane_id[plane.unit_number] = plane_id
   end
 end
 
 ---Cleans up the state, removing non-existent entities
 function M.cleanup()
-  for plane_id, plane_data in pairs(global.state.plane_data) do
+  for plane_id, plane_data in pairs(storage.state.plane_data) do
     if not plane_data.entity.valid then
-      global.state.plane_data[plane_id] = nil
+      storage.state.plane_data[plane_id] = nil
     end
   end
-  for unit_number, plane_id in pairs(global.state.entity_to_plane_id) do
-    local plane_data = global.state.plane_data[plane_id]
+  for unit_number, plane_id in pairs(storage.state.entity_to_plane_id) do
+    local plane_data = storage.state.plane_data[plane_id]
     if plane_data then
       local plane = plane_data.entity
       if not (plane.valid and plane.unit_number == unit_number) then
-        global.state.entity_to_plane_id[unit_number] = nil
+        storage.state.entity_to_plane_id[unit_number] = nil
       end
     else
-      global.state.entity_to_plane_id[unit_number] = nil
+      storage.state.entity_to_plane_id[unit_number] = nil
     end
   end
 end

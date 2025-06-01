@@ -4,8 +4,7 @@ local plane_tech = {
   name = "c5-galaxy",
   icon = "__c5-galaxy__/graphics/icon.png",
   icon_size = 512,
-  icon_mipmaps = 1,
-  prerequisites = { "low-density-structure", "advanced-electronics-2" },
+  prerequisites = { "low-density-structure", "processing-unit" },
   unit = {
     count_formula = "500",
     ingredients = {
@@ -21,7 +20,6 @@ local plane_tech = {
     { type = "unlock-recipe", recipe = "taxi-marker" },
     { type = "unlock-recipe", recipe = "takeoff-marker" },
     { type = "unlock-recipe", recipe = "landing-marker" },
-    { type = "unlock-recipe", recipe = "c5-galaxy-tool-path" },
   },
 }
 data:extend { plane_tech }

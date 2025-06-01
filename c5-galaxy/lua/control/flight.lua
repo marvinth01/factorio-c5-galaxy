@@ -70,11 +70,11 @@ local function swap_plane_prototype(name_from, name_to, plane)
   local passenger = old_plane.get_passenger()
 
   -- Move over the plane's information (e.g. autopilot data)
-  local plane_id = global.state.entity_to_plane_id[plane.unit_number]
-  global.state.plane_data[plane_id].entity = new_plane
-  global.state.entity_to_plane_id[new_plane.unit_number] = plane_id
+  local plane_id = storage.state.entity_to_plane_id[plane.unit_number]
+  storage.state.plane_data[plane_id].entity = new_plane
+  storage.state.entity_to_plane_id[new_plane.unit_number] = plane_id
   -- Deleting will be done on the next cleanup, no need to do it here
-  --global.state.entity_to_plane_id[old_plane.unit_number] = nil -- Hopefully doing this this early won't lead to problems
+  --storage.state.entity_to_plane_id[old_plane.unit_number] = nil -- Hopefully doing this this early won't lead to problems
 
   old_plane.destroy { raise_destroy = true }
   new_plane.set_driver(driver)
@@ -101,7 +101,7 @@ local function update_shadow(plane)
       tint = { 1, 1, 1, 0.5 * math.max(0.0, (fadeout_height - height) / fadeout_height) },
       animation_speed = 0,
       animation_offset = orientation_to_idx(plane.orientation, 128),
-      time_to_live = 2,
+      time_to_live = 1,
     }
   end
 end
@@ -130,7 +130,7 @@ function M.tick_plane_grounded_takeoff(plane)
   if plane.speed == 0 then
     local tile = plane.surface.get_tile(plane.position)
     local cliff = plane.surface.find_entity("cliff", plane.position)
-    if cliff or tile.collides_with("water-tile") then
+    if cliff or tile.collides_with("water_tile") then
       local driver = plane.get_driver()
       local passenger = plane.get_passenger()
       if driver and not driver.is_player() then driver.die() end
