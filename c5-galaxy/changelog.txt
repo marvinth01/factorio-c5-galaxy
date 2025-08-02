@@ -112,3 +112,8 @@ Date: 2025-06-01
   Changes:
     - Updated for 2.0
     - With space age enabled, minimum pressure is 700 hPa and max gravity 20 m/s^2
+---------------------------------------------------------------------------------------------------
+Version: 3.0.1
+Date: 2025-08-02
+  Bugfixes:
+    - Add localized string for control tool shortcut
